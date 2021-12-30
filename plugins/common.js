@@ -56,6 +56,8 @@ export default {
     if (data_key_encrypted == undefined)
       return [];
     const data_key_encoded = CryptoJS.AES.decrypt(data_key_encrypted, secret_key).toString(CryptoJS.enc.Utf8);
+    if (!data_key_encoded)
+      return [];
     const data_keys = JSON.parse(data_key_encoded);
     return data_keys;
   },
