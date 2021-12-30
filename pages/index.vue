@@ -20,36 +20,45 @@
               dense
               @click="clickEncrypted"
             ></v-textarea>
-            <a :href="encrypted_link">link</a>
+            <v-btn :to="encrypted_link"><v-icon>mdi-link-variant</v-icon></v-btn>
           </template>
         </v-card-text>
-      </v-card>
-    </v-col>
-    <v-col cols="12" sm="12" md="12">
-      <v-card>
-        <v-card-text>
-          <v-text-field v-model="master_password_0" label="Old Master Password" type="password"></v-text-field>
-          <v-text-field v-model="master_password_1" label="New Master Password" type="password"></v-text-field>
-          <v-text-field v-model="master_password_2" label="New Master Password (Confirm)" type="password"></v-text-field>
-          <v-btn
-            elevation="2"
-            @click="clickRotate"
-          >Rotate</v-btn>
-          <v-alert
-            dense
-            outlined
-            type="error"
-            v-if="errorMessage"
-          >{{errorMessage}}</v-alert>
-          <v-textarea
-            label="Data Key Encrypted"
-            ref="data_key_encrypted"
-            v-model="data_key_encrypted"
-            outlined
-            dense
-            @click="clickDataKeyEncrypted"
-          ></v-textarea>
-        </v-card-text>
+        <template v-if="!view_admin">
+          <v-card-text>
+            <v-btn
+              elevation="2"
+              @click="view_admin=true"
+            ><v-icon>mdi-cog</v-icon></v-btn>
+          </v-card-text>
+        </template>
+        <template v-if="view_admin">
+          <v-card-text>
+            <v-text-field v-model="master_password_0" label="Old Master Password" type="password"></v-text-field>
+            <v-text-field v-model="master_password_1" label="New Master Password" type="password"></v-text-field>
+            <v-text-field v-model="master_password_2" label="New Master Password (Confirm)" type="password"></v-text-field>
+            <v-btn
+              elevation="2"
+              @click="clickRotate"
+            >Rotate</v-btn>
+          </v-card-text>
+          <v-card-text v-if="errorMessage">
+            <v-alert
+              dense
+              outlined
+              type="error"
+            >{{errorMessage}}</v-alert>
+          </v-card-text>
+          <v-card-text>
+            <v-textarea
+              label="Data Key Encrypted"
+              ref="data_key_encrypted"
+              v-model="data_key_encrypted"
+              outlined
+              dense
+              @click="clickDataKeyEncrypted"
+            ></v-textarea>
+          </v-card-text>
+        </template>
       </v-card>
     </v-col>
   </v-row>
@@ -69,6 +78,7 @@ export default {
       master_password_1: "",
       master_password_2: "",
       errorMessage: "",
+      view_admin: false,
     };
   },
   computed: {
