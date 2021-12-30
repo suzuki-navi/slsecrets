@@ -73,7 +73,17 @@
 </template>
 
 <script>
+import common from '@/plugins/common'
+
 export default {
-  name: 'IndexPage'
+  created() {
+    let q = this.$route.query.q;
+    if (q == undefined) {
+      q = "";
+    }
+    console.log(q);
+    const result = common.sample(q);
+    console.log(result);
+  }
 }
 </script>
