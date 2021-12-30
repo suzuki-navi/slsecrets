@@ -2,71 +2,29 @@
   <v-row justify="center" align="center">
     <v-col cols="12" sm="8" md="6">
       <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
         <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Nuxt GitHub
-          </a>
+          <v-textarea
+            label="Data"
+            ref="data2"
+            v-model="data2"
+            outlined
+            dense
+            @click="clickData"
+          ></v-textarea>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
+        <v-card-text>
+          <v-textarea
+            label="Encrypted"
+            ref="encrypted2"
+            v-model="encrypted2"
+            outlined
+            dense
+            @click="clickEncrypted"
+          ></v-textarea>
+        </v-card-text>
+        <v-card-text>
+          <a :href="'?q=' + encrypted">link</a>
+        </v-card-text>
       </v-card>
     </v-col>
   </v-row>
@@ -76,14 +34,47 @@
 import common from '@/plugins/common'
 
 export default {
+  data() {
+    return {
+      data: "",
+      encrypted: "",
+    };
+  },
+  computed: {
+    data2: {
+      get() {
+        return this.data;
+      },
+      set(value) {
+        this.data = value;
+        this.encrypted = common.encrypt(this.data, this.$cookies);
+      },
+    },
+    encrypted2: {
+      get() {
+        return this.encrypted;
+      },
+      set(value) {
+        this.encrypted = value;
+        this.data = common.decrypt(value, this.$cookies);
+      }
+    },
+  },
+  methods: {
+    clickData() {
+      this.$refs.data2.$el.querySelector("textarea").select();
+    },
+    clickEncrypted() {
+      this.$refs.encrypted2.$el.querySelector("textarea").select();
+    },
+  },
   created() {
     let q = this.$route.query.q;
     if (q == undefined) {
       q = "";
     }
-    console.log(q);
-    const result = common.sample(q);
-    console.log(result);
-  }
+    this.encrypted = q;
+    this.data = common.decrypt(q, this.$cookies);
+  },
 }
 </script>
