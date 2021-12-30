@@ -23,6 +23,12 @@
             <v-btn :to="encrypted_link"><v-icon>mdi-link-variant</v-icon></v-btn>
           </template>
         </v-card-text>
+        <v-card-text>
+          <v-btn
+            elevation="2"
+            @click="generate_random"
+          >Generate random</v-btn>
+        </v-card-text>
         <template v-if="!view_admin">
           <v-card-text>
             <v-btn
@@ -118,7 +124,7 @@ export default {
         return data_key_encrypted;
       },
       set(value) {
-        this.$cookies.set("data_key_encrypted", value)
+        this.$cookies.set("data_key_encrypted", value);
       },
     },
   },
@@ -131,6 +137,11 @@ export default {
     },
     clickDataKeyEncrypted() {
       this.$refs.data_key_encrypted.$el.querySelector("textarea").select();
+    },
+    generate_random() {
+      const random_data = common.generatePassword(10);
+      this.data = random_data;
+      this.new_encrypted = common.encrypt(this.data, this.$cookies);
     },
     clickRotate() {
       if (this.master_password_1 != this.master_password_2) {

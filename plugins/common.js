@@ -76,16 +76,16 @@ export default {
     const new_secret_key = this.calcSecretKey(new_master_password);
 
     const data_keys = this.getDataKey(cookies);
-    data_keys.unshift(this.generatePassword());
+    data_keys.unshift(this.generatePassword(32));
     const new_data_key_encoded = JSON.stringify(data_keys);
     const new_data_key_encrypted = CryptoJS.AES.encrypt(new_data_key_encoded, new_secret_key).toString();
     cookies.set("data_key_encrypted", new_data_key_encrypted, {maxAge: 30 * 86400});
     cookies.set("secret", new_secret_key, {maxAge: 30 * 86400})
   },
-  generatePassword() {
+  generatePassword(len) {
     const chs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=-#%&";
     let p = "";
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < len; i++) {
       p += chs.charAt(Math.floor(Math.random() * chs.length));
     }
     return p;
