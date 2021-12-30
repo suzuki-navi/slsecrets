@@ -149,7 +149,7 @@ export default {
         return;
       }
       if (this.master_password_1 == "") {
-        console.log("Empty new password");
+        this.errorMessage = "Empty new password";
         return;
       }
       this.errorMessage = "";
