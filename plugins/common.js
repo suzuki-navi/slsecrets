@@ -15,9 +15,13 @@ export default {
   decrypt(encrypted, cookies) {
     const self = this;
     function decrypt_sub(encrypted, data_key) {
-      const encrypted2 = self.base64FromUrl(encrypted);
-      const decrypted = CryptoJS.AES.decrypt(encrypted2, data_key).toString(CryptoJS.enc.Utf8);
-      return decrypted;
+      try {
+        const encrypted2 = self.base64FromUrl(encrypted);
+        const decrypted = CryptoJS.AES.decrypt(encrypted2, data_key).toString(CryptoJS.enc.Utf8);
+        return decrypted;
+      } catch (e) {
+        return "";
+      }
     }
     let firstFlag = true;
     for (const data_key of this.getDataKey(cookies)) {

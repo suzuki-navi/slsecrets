@@ -103,7 +103,8 @@ export default {
       },
       set(value) {
         this.new_encrypted = value;
-        [_, this.data] = common.decrypt(value, this.$cookies);
+        const [enc, data] = common.decrypt(value, this.$cookies);
+        this.data = data;
       },
     },
     encrypted_link: {
@@ -124,7 +125,24 @@ export default {
         return data_key_encrypted;
       },
       set(value) {
+        if (value == this.$cookies.get("data_key_encrypted")) {
+          return
+        }
         this.$cookies.set("data_key_encrypted", value);
+        if (value == "") {
+          if (this.data == "") {
+            // nothing
+          } else {
+            this.new_encrypted = "";
+          }
+        } else {
+          if (this.data == "") {
+            const [enc, data] = common.decrypt(this.encrypted, this.$cookies);
+            this.data = data;
+          } else {
+            this.new_encrypted = common.encrypt(this.data, this.$cookies);
+          }
+        }
       },
     },
   },
