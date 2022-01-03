@@ -190,6 +190,7 @@ export default {
     }
     this.encrypted = q;
     [this.new_encrypted, this.data] = common.decrypt(q, this.$cookies);
+    common.refreshCookie(this.$cookies);
   },
 }
 </script>

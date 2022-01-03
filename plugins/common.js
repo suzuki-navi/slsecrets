@@ -94,4 +94,14 @@ export default {
     }
     return p;
   },
+  refreshCookie(cookie) {
+    function sub(name) {
+      const value = cookie.get(name);
+      if (value != undefined) {
+        cookie.set(name, value, {maxAge: 30 * 86400});
+      }
+    }
+    sub("data_key_encrypted");
+    sub("secret");
+  },
 }
