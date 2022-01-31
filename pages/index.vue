@@ -39,7 +39,7 @@
         </template>
         <template v-if="view_admin">
           <v-card-text>
-            <v-text-field v-model="master_password_0" label="Old Master Password" type="password"></v-text-field>
+            <v-text-field v-model="master_password" label="Current Master Password" type="password"></v-text-field>
             <v-text-field v-model="master_password_1" label="New Master Password" type="password"></v-text-field>
             <v-text-field v-model="master_password_2" label="New Master Password (Confirm)" type="password"></v-text-field>
             <v-btn
@@ -116,6 +116,16 @@ export default {
         }
       },
     },
+    master_password: {
+      get() {
+        return this.master_password_0;
+      },
+      set(value) {
+        this.master_password_0 = value;
+        common.setMasterPassword(value, this.$cookies);
+        this.refresh();
+      },
+    },
     data_key_encrypted: {
       get() {
         this.rotate_counter; // rotate_counterがカウントアップされるたびに再描画されるようにするためのコード
@@ -128,7 +138,13 @@ export default {
         if (value == this.$cookies.get("data_key_encrypted")) {
           return
         }
-        this.$cookies.set("data_key_encrypted", value);
+        this.$cookies.set("data_key_encrypted", value, {maxAge: 30 * 86400});
+        if (this.master_password_0 != "") {
+      console.log("setMasterPassword");
+          common.setMasterPassword(this.master_password_0, this.$cookies);
+        }
+        this.refresh();
+        /*
         if (value == "") {
           if (this.data == "") {
             // nothing
@@ -143,6 +159,7 @@ export default {
             this.new_encrypted = common.encrypt(this.data, this.$cookies);
           }
         }
+        */
       },
     },
   },
@@ -161,13 +178,18 @@ export default {
       this.data = random_data;
       this.new_encrypted = common.encrypt(this.data, this.$cookies);
     },
+    refresh() {
+      console.log("refresh");
+      if (this.data == "") {
+        const [enc, data] = common.decrypt(this.encrypted, this.$cookies);
+        this.data = data;
+      } else {
+        this.new_encrypted = common.encrypt(this.data, this.$cookies);
+      }
+    },
     clickRotate() {
       if (this.master_password_1 != this.master_password_2) {
         this.errorMessage = "New passwords do not match";
-        return;
-      }
-      if (this.master_password_1 == "") {
-        this.errorMessage = "Empty new password";
         return;
       }
       this.errorMessage = "";

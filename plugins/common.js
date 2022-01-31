@@ -20,7 +20,7 @@ export default {
         const decrypted = CryptoJS.AES.decrypt(encrypted2, data_key).toString(CryptoJS.enc.Utf8);
         return decrypted;
       } catch (e) {
-        return "";
+        return [encrypted, ""];
       }
     }
     let firstFlag = true;
@@ -56,19 +56,33 @@ export default {
     const secret_key = cookies.get("secret");
     if (secret_key == undefined)
       return [];
+    return this.getDataKey2(secret_key, cookies);
+  },
+  getDataKey2(secret_key, cookies) {
     const data_key_encrypted = cookies.get("data_key_encrypted");
     if (data_key_encrypted == undefined)
       return [];
-    const data_key_encoded = CryptoJS.AES.decrypt(data_key_encrypted, secret_key).toString(CryptoJS.enc.Utf8);
-    if (!data_key_encoded)
+    try {
+      const data_key_encoded = CryptoJS.AES.decrypt(data_key_encrypted, secret_key).toString(CryptoJS.enc.Utf8);
+      if (!data_key_encoded)
+        return [];
+      const data_keys = JSON.parse(data_key_encoded);
+      return data_keys;
+    } catch (e) {
       return [];
-    const data_keys = JSON.parse(data_key_encoded);
-    return data_keys;
+    }
   },
   calcSecretKey(master_key) {
     const salt = "slsecrets";
     const hash = CryptoJS.SHA256(salt + master_key);
     return CryptoJS.enc.Base64.stringify(hash);
+  },
+  setMasterPassword(master_password, cookies) {
+    const secret_key = this.calcSecretKey(master_password);
+    const data_keys = this.getDataKey2(secret_key, cookies);
+    if (data_keys.length > 0) {
+      cookies.set("secret", secret_key, {maxAge: 30 * 86400});
+    }
   },
   rotateDataKey(old_master_password, new_master_password, cookies, errorHandler) {
     const old_secret_key = this.calcSecretKey(old_master_password);
@@ -84,7 +98,7 @@ export default {
     const new_data_key_encoded = JSON.stringify(data_keys);
     const new_data_key_encrypted = CryptoJS.AES.encrypt(new_data_key_encoded, new_secret_key).toString();
     cookies.set("data_key_encrypted", new_data_key_encrypted, {maxAge: 30 * 86400});
-    cookies.set("secret", new_secret_key, {maxAge: 30 * 86400})
+    cookies.set("secret", new_secret_key, {maxAge: 30 * 86400});
   },
   generatePassword(len) {
     const chs = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=-#%&";
